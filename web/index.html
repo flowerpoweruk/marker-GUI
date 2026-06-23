@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Marker Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">
+      <span class="swipe" aria-hidden="true"></span>
+      <span class="brand-text">Marker<span class="brand-thin">Studio</span></span>
+    </span>
+    <span class="brand-sub">documents → markdown</span>
+  </div>
+  <div class="status" id="status">
+    <span class="dot" id="status-dot"></span>
+    <span id="status-text">Starting…</span>
+  </div>
+</header>
+
+<main class="layout">
+  <!-- LEFT: files + results -->
+  <section class="stage">
+    <div class="dropzone" id="dropzone">
+      <span class="tick tl"></span><span class="tick tr"></span>
+      <span class="tick bl"></span><span class="tick br"></span>
+      <div class="dz-inner">
+        <div class="dz-glyph" aria-hidden="true">↥</div>
+        <p class="dz-title">Drop files here</p>
+        <p class="dz-sub">or <button class="linklike" id="browse-btn" type="button">choose from your computer</button></p>
+        <p class="dz-formats">PDF · PNG · JPG · DOCX · PPTX · XLSX · HTML · EPUB</p>
+      </div>
+      <input type="file" id="file-input" multiple hidden
+        accept=".pdf,.png,.jpg,.jpeg,.gif,.webp,.tiff,.bmp,.docx,.pptx,.xlsx,.html,.htm,.epub" />
+    </div>
+
+    <div class="queue-head" id="queue-head" hidden>
+      <h2 class="eyebrow">Queue <span class="count" id="queue-count">0</span></h2>
+      <button class="linklike subtle" id="clear-btn" type="button">Clear all</button>
+    </div>
+    <ul class="queue" id="queue"></ul>
+  </section>
+
+  <!-- RIGHT: settings -->
+  <aside class="panel">
+    <h2 class="eyebrow">Output format</h2>
+    <div class="segmented" id="format-seg" role="radiogroup" aria-label="Output format">
+      <button class="seg active" data-value="markdown" role="radio" aria-checked="true">Markdown</button>
+      <button class="seg" data-value="html" role="radio" aria-checked="false">HTML</button>
+      <button class="seg" data-value="json" role="radio" aria-checked="false">JSON</button>
+      <button class="seg" data-value="chunks" role="radio" aria-checked="false">Chunks</button>
+    </div>
+
+    <h2 class="eyebrow gap">Quality</h2>
+    <label class="toggle">
+      <input type="checkbox" id="use_llm" />
+      <span class="track"><span class="knob"></span></span>
+      <span class="toggle-label">
+        Use an LLM for higher accuracy
+        <span class="hint">Improves tables, forms and inline maths. Needs an API key.</span>
+      </span>
+    </label>
+
+    <div class="llm-config" id="llm-config" hidden>
+      <label class="field">
+        <span class="field-label">Provider</span>
+        <select id="llm_service">
+          <option value="gemini">Google Gemini</option>
+          <option value="claude">Anthropic Claude</option>
+          <option value="openai">OpenAI</option>
+          <option value="ollama">Ollama (local)</option>
+        </select>
+      </label>
+      <label class="field" id="apikey-field">
+        <span class="field-label">API key</span>
+        <input type="password" id="llm_api_key" placeholder="Paste key — stays on this machine" autocomplete="off" />
+      </label>
+      <label class="field">
+        <span class="field-label">Model <span class="opt">optional</span></span>
+        <input type="text" id="llm_model" placeholder="Leave blank for the default" />
+      </label>
+      <label class="field" id="baseurl-field" hidden>
+        <span class="field-label">Base URL</span>
+        <input type="text" id="llm_base_url" placeholder="http://localhost:11434" />
+      </label>
+      <label class="toggle small">
+        <input type="checkbox" id="redo_inline_math" />
+        <span class="track"><span class="knob"></span></span>
+        <span class="toggle-label">Highest-quality inline maths</span>
+      </label>
+    </div>
+
+    <button class="disclosure" id="adv-toggle" type="button" aria-expanded="false">
+      <span class="chev">›</span> Advanced settings
+    </button>
+
+    <div class="advanced" id="advanced" hidden>
+      <label class="field">
+        <span class="field-label">Page range <span class="opt">PDFs</span></span>
+        <input type="text" id="page_range" placeholder="e.g. 0,5-10,20" />
+      </label>
+      <label class="toggle small">
+        <input type="checkbox" id="force_ocr" />
+        <span class="track"><span class="knob"></span></span>
+        <span class="toggle-label">Force OCR on every page
+          <span class="hint">Fixes garbled text. Slower.</span></span>
+      </label>
+      <label class="toggle small">
+        <input type="checkbox" id="strip_existing_ocr" />
+        <span class="track"><span class="knob"></span></span>
+        <span class="toggle-label">Strip existing OCR, then re-read</span>
+      </label>
+      <label class="toggle small">
+        <input type="checkbox" id="paginate_output" />
+        <span class="track"><span class="knob"></span></span>
+        <span class="toggle-label">Mark page breaks in output</span>
+      </label>
+      <label class="toggle small">
+        <input type="checkbox" id="disable_image_extraction" />
+        <span class="track"><span class="knob"></span></span>
+        <span class="toggle-label">Skip image extraction</span>
+      </label>
+      <label class="toggle small">
+        <input type="checkbox" id="disable_ocr_math" />
+        <span class="track"><span class="knob"></span></span>
+        <span class="toggle-label">Don't convert maths to LaTeX</span>
+      </label>
+    </div>
+  </aside>
+</main>
+
+<footer class="actionbar">
+  <div class="outfolder">
+    <span class="eyebrow tiny">Save to</span>
+    <button class="folder-btn" id="folder-btn" type="button">
+      <span class="folder-icon" aria-hidden="true">▸</span>
+      <span class="folder-path" id="folder-path">Choose output folder…</span>
+    </button>
+  </div>
+  <button class="convert" id="convert-btn" type="button" disabled>
+    <span id="convert-label">Convert</span>
+  </button>
+</footer>
+
+<div class="toast" id="toast" hidden></div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

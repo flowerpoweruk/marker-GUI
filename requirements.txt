@@ -1,0 +1,6 @@
+# Marker Studio dependencies.
+# The launcher installs these automatically — you don't need to run this by hand.
+marker-pdf[full]>=1.10.0
+fastapi>=0.115
+uvicorn>=0.30
+python-multipart>=0.0.9

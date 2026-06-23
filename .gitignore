@@ -1,0 +1,17 @@
+# Environment created by the launcher
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Build artifacts
+build/
+dist/
+*.spec.bak
+
+# OS
+.DS_Store
+Thumbs.db
