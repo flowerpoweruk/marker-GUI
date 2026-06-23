@@ -1,6 +1,6 @@
 # Marker Studio
 
-A simple, elegant desktop app for [Marker](https://github.com/datalab-to/marker) — the document-to-Markdown converter. No command line. Drop in your files, pick where to save, hit **Convert**.
+A simple, desktop GUI app for [Marker](https://github.com/datalab-to/marker) — the document-to-Markdown converter. No command line. Drop in your files, pick where to save, hit **Convert**.
 
 Marker is excellent but lives entirely on the command line. Marker Studio wraps it in a clean interface so anyone can use it: drag in one file or fifty, choose an output folder, adjust any setting through toggles instead of flags.
 
